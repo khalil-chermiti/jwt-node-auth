@@ -1,17 +1,27 @@
 const jwt = require('jsonwebtoken');
-const {searchByUsername} = require('../model/login.model') ;
+const {scryptSync, timingSafeEqual} = require('crypto');
 const { JWT_SECRET } = require('../utils/config.js');
+const {searchByUsername} = require('../model/login.model') ;
+
+function verify (password , hash) {
+    const [salt , key] = hash.split(':');
+    const passwordBuffer = scryptSync(password, salt , 64) ;
+    const keyBuffer = Buffer.from(key , 'hex') ;
+    const match = timingSafeEqual(passwordBuffer , keyBuffer) ;
+
+    return match ; 
+}
 
 async function loginUser(req , res) {
     const user = req.body ;
 
-    if (!user || !user.username || !user.password ) return res.json({"message" : "missing info"})
+    if (!user || !user.username || !user.password ) return res.json({"message" : "missing info"}) ;
+
     // get user from db
     const dbUser = await searchByUsername(user.username) ;
 
-    // compare database 
-
-    if (!dbUser || user.password !== dbUser.password) return res.json({"message" : "wrong username or password"}) ;
+    // check password 
+    if (!verify(user.password , dbUser.password)) return res.json({"message" : "wrong username or password"}) ;
 
     // sign jwt
 
