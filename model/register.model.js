@@ -6,7 +6,11 @@ async function createUser (userObj) {
         password : userObj.password ,
     })
 } ;
+async function usernameExists (username) {
+    return await user.find({"username" : username});
+} ;
 
 module.exports = {
     createUser ,
+    usernameExists,
 }
