@@ -16,8 +16,6 @@ function jwtAuth(req , res , next) {
 
     const decodedToken = jwt.verify(token , JWT_SECRET) ;
 
-    console.log("hellooooooooooooo" , decodedToken) ;
-
     if (!decodedToken) {
       return res.clearCookie("access_token").redirect("/login");
     }
