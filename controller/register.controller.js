@@ -1,14 +1,14 @@
 const {createUser , usernameExists} = require('../model/register.model');
 const {JWT_SECRET} = require('../utils/config') ;
 const jwt = require('jsonwebtoken') ;
-const {randomBytes, createHash} = require('crypto') ; 
+const {randomBytes, scryptSync} = require('crypto') ; 
 const { userExist } = require('../middleware/authenticate');
 
 // ! encrypting password 
 
 function hash(password) {
     const salt = randomBytes(16).toString('hex') ;
-    const hashedPassword = createHash('sha256').update(password).digest('hex');
+    const hashedPassword = scryptSync(password , salt , 64).toString('hex');
     return `${salt}:${hashedPassword}` ;
 }
 
